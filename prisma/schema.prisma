@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+
+
+model User {
+  id        String     @id @default(uuid())
+  email     String     @unique
+  password  String
+  name      String?
+  cpf       String?
+  birthDate DateTime?
+  lists     GiftList[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model GiftList {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  slug        String   @unique
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  gifts       Gift[]
+  isPrivate   Boolean  @default(false)
+  eventType   String?
+  eventDate   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Gift {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  price       Decimal
+  imageUrl    String?
+  category    String?  @default("OUTROS") // VIAGEM, CASA, EXPERIENCIA, OUTROS
+  status      String   @default("AVAILABLE") // AVAILABLE, RESERVED, PURCHASED
+  listId      String
+  list        GiftList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
